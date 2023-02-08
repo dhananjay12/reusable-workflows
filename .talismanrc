@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: .github/actions/action.yml
+  checksum: 32e29f8913202aa9626afa1d963e720a62b4f0b47f6a155542c68319c091225d
+version: ""
