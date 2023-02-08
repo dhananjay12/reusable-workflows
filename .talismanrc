@@ -1,4 +1,4 @@
 fileignoreconfig:
-- filename: .github/actions/action.yml
-  checksum: 32e29f8913202aa9626afa1d963e720a62b4f0b47f6a155542c68319c091225d
+- filename: .github/actions/init-maven/action.yml
+  checksum: a21910c9f5a36c936851f745a91fb1cc062da25c30b0e67e00c5fa1805207017
 version: ""
