@@ -1,5 +1,5 @@
 name: "Initialize Java Maven"
-description: "Setup Java and maven cache(based on pom.xml)"
+description: "Checkout and setup Java and maven cache(based on pom.xml)"
 inputs:
   java-version:
     description: "Java version to Initialize repo"
@@ -12,6 +12,8 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Checkout
+      uses: actions/checkout@v3
     - name: Setup JDK 17
       uses: actions/setup-java@v3
       with:
