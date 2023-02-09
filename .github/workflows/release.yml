@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize Java and Maven
-        uses: ./.github/actions/init-maven
+        uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
       - name: Build with Maven
         run: mvn clean verify
 
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize Java and Maven
-        uses: ./.github/actions/init-maven
+        uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
       # Make sure automatic scanning of the project in sonarcloud UI is disable. It can only do via pull or push
       - name: Sonar Cloud scan
         env:
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize Java and Maven
-        uses: ./.github/actions/init-maven
+        uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
       - name: Prepare variables
         id: vars
         run: |
