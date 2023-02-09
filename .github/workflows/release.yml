@@ -4,9 +4,9 @@ name: Release
 on:
   workflow_call:
     secrets:
-      GITHUB_TOKEN:
+      REPO_TOKEN:
         required: true
-        description: Needed to get some information about the pull request, if any
+        description: GITHUB_TOKEN Needed to get some information about the pull request, if any
       SONAR_TOKEN:
         required: true
         description: SonarCloud access token should be generated from https://sonarcloud.io/account/security/
@@ -35,7 +35,7 @@ jobs:
       - name: Sonar Cloud scan
         env:
           # Needed to get some information about the pull request, if any
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
           # SonarCloud access token should be generated from https://sonarcloud.io/account/security/
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
