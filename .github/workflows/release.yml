@@ -45,6 +45,9 @@ jobs:
     steps:
       - name: Initialize Java and Maven
         uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: ${{ inputs.distribution }}
       # Make sure automatic scanning of the project in sonarcloud UI is disable. It can only do via pull or push
       - name: Sonar Cloud scan
         env:
@@ -61,6 +64,9 @@ jobs:
     steps:
       - name: Initialize Java and Maven
         uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: ${{ inputs.distribution }}
       - name: Prepare variables
         id: vars
         run: |
