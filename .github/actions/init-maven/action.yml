@@ -4,7 +4,7 @@ inputs:
   java-version:
     description: "Java version to Initialize repo"
     required: false
-    default: "17"
+    default: "11"
   distribution:
     description: "Whether to cache dependencies or not."
     required: false
@@ -14,7 +14,7 @@ runs:
   steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Setup JDK 17
+    - name: Setup JDK ${{ inputs.java-version }}
       uses: actions/setup-java@v3
       with:
         java-version: ${{ inputs.java-version }}
