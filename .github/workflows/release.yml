@@ -7,11 +7,13 @@ on:
       java-version:
         description: "Java version to Initialize repo"
         required: false
-        default: "17"
+        default: '17'
+        type: number
       distribution:
         description: "Whether to cache dependencies or not."
         required: false
-        default: "adopt"
+        default: 'adopt'
+        type: string
     secrets:
       REPO_TOKEN:
         required: true
