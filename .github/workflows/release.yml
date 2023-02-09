@@ -6,13 +6,13 @@ on:
     inputs:
       java-version:
         description: "Java version to Initialize repo"
-        required: false
         default: '17'
+        required: false
         type: number
       distribution:
         description: "Whether to cache dependencies or not."
-        required: false
         default: 'adopt'
+        required: false
         type: string
     secrets:
       REPO_TOKEN:
