@@ -4,7 +4,7 @@ inputs:
   java-version:
     description: "Java version to Initialize repo"
     required: false
-    default: "11"
+    default: "17"
   distribution:
     description: "Whether to cache dependencies or not."
     required: false

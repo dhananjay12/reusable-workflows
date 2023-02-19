@@ -1,0 +1,38 @@
+name: "Maven releases"
+description: "Maven RC, Minor and Patch releases"
+inputs:
+  pom-path:
+    description: 'POM file location'
+    required: false
+    default: 'pom.xml'
+  release-minor:
+    description: 'Release minor version'
+    required: false
+    default: 'false'
+  release-patch:
+    description: 'Release patch version'
+    required: false
+    default: 'false'
+runs:
+  using: "composite"
+  steps:
+    - name: Current POM version
+      id: current-pom
+      shell: bash
+      run: |
+        echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --file ${{ inputs.pom }})" >> $GITHUB_OUTPUT
+    - name: Release RC version
+      if: (!inputs.release-minor && !inputs.release-patch)
+      shell: bash
+      run: |
+        echo "Release RC Version"
+    - name: Release Minor version
+      if: inputs.release-minor
+      shell: bash
+      run: |
+        echo "Release Minor Version"
+    - name: Release Patch version
+      if: inputs.release-patch
+      shell: bash
+      run: |
+        echo "Release Patch Version"
