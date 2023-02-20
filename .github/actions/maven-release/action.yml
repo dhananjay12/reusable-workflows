@@ -16,23 +16,60 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Current POM version
-      id: current-pom
+    - name: Validate inputs
       shell: bash
       run: |
-        echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --file ${{ inputs.pom }})" >> $GITHUB_OUTPUT
+        if [ -z "${{ inputs.release-minor }}" ] || [ -z "${{ inputs.release-patch }}" ]; then
+          echo "Cannot release both minor and patch"
+          exit 1
+        fi
+    - name: Current POM version
+      id: pom-version
+      shell: bash
+      run: |
+        current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --file ${{ inputs.pom }})
+        current_version=${current_version%-*}
+        VERSION_PARTS=(${current_version//-rc./ })
+        sem_ver=${VERSION_PARTS[0]}
+        echo "current_sem_ver=${sem_ver}" >> $GITHUB_OUTPUT
+        rc_ver=${VERSION_PARTS[1]}
+        SEM_VER_PARTS=(${sem_ver//./ })
+        echo "major=${SEM_VER_PARTS[0]}" >> $GITHUB_OUTPUT
+        echo "minor=${SEM_VER_PARTS[1]}" >> $GITHUB_OUTPUT
+        echo "patch=${SEM_VER_PARTS[2]}" >> $GITHUB_OUTPUT
+        echo "rc_ver=${rc_ver}" >> $GITHUB_OUTPUT
     - name: Release RC version
       if: (!inputs.release-minor && !inputs.release-patch)
+      env:
+        RC_VER: ${{steps.pom-version.outputs.rc_ver}}
+        CURRENT_SEM_VER: ${{steps.pom-version.outputs.current_sem_ver}}
       shell: bash
       run: |
-        echo "Release RC Version"
+        if [ -z ${{ RC_VER }} ]
+          mvn -Darguments=-Dmaven.test.skip release:prepare release:perform  \
+          -DreleaseVersion=${CURRENT_SEM_VER}-rc.$(RC_VER) \
+          -DdevelopmentVersion=${CURRENT_SEM_VER}-rc.$((RC_VER+1))-SNAPSHOT
+        fi
     - name: Release Minor version
       if: inputs.release-minor
       shell: bash
+      env:
+        CURRENT_SEM_VER: ${{steps.pom-version.outputs.current_sem_ver}}
+        MAJOR: ${{steps.pom-version.outputs.major}}
+        MINOR: ${{steps.pom-version.outputs.minor}}
       run: |
-        echo "Release Minor Version"
+          mvn -Darguments=-Dmaven.test.skip release:prepare release:perform  \
+          -DreleaseVersion=${CURRENT_SEM_VER} \
+          -DdevelopmentVersion=${MAJOR}.$((MINOR+1)).0-rc.0-SNAPSHOT
     - name: Release Patch version
       if: inputs.release-patch
       shell: bash
+      env:
+        CURRENT_SEM_VER: ${{steps.pom-version.outputs.current_sem_ver}}
+        MAJOR: ${{steps.pom-version.outputs.major}}
+        MINOR: ${{steps.pom-version.outputs.minor}}
+        PATCH: ${{steps.pom-version.outputs.patch}}
       run: |
-        echo "Release Patch Version"
+          mvn -Darguments=-Dmaven.test.skip release:prepare release:perform  \
+          -DreleaseVersion=${MAJOR}.${MINOR}.$((PATCH+1)) \
+          -DdevelopmentVersion=${MAJOR}.${MINOR}.$((PATCH+1))-SNAPSHOT

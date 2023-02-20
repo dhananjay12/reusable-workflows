@@ -57,7 +57,17 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
-
+  artifact-release:
+    needs: sonar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Initialize Java and Maven
+        uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: ${{ inputs.distribution }}
+      - name: Release rc version
+        uses: dhananjay12/reusable-workflows/.github/actions/maven-release@main
   docker:
     needs: sonar
     runs-on: ubuntu-latest
