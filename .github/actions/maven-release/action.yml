@@ -21,6 +21,9 @@ inputs:
     description: "Whether to cache dependencies or not."
     required: false
     default: "adopt"
+  gh-token:
+    description: "Github Token to release git tags"
+    required: true
 runs:
   using: "composite"
   steps:
@@ -56,6 +59,7 @@ runs:
       env:
         RC_VER: ${{steps.pom-version.outputs.rc_ver}}
         CURRENT_SEM_VER: ${{steps.pom-version.outputs.current_sem_ver}}
+        GITHUB_TOKEN: ${{ inputs.gh-token }}
       shell: bash
       run: |
         if [ -z ${RC_VER} ]
@@ -70,6 +74,7 @@ runs:
         CURRENT_SEM_VER: ${{steps.pom-version.outputs.current_sem_ver}}
         MAJOR: ${{steps.pom-version.outputs.major}}
         MINOR: ${{steps.pom-version.outputs.minor}}
+        GITHUB_TOKEN: ${{ inputs.gh-token }}
       run: |
           mvn -Darguments=-Dmaven.test.skip release:prepare release:perform  \
           -DreleaseVersion=${CURRENT_SEM_VER} \
@@ -82,6 +87,7 @@ runs:
         MAJOR: ${{steps.pom-version.outputs.major}}
         MINOR: ${{steps.pom-version.outputs.minor}}
         PATCH: ${{steps.pom-version.outputs.patch}}
+        GITHUB_TOKEN: ${{ inputs.gh-token }}
       run: |
           mvn -Darguments=-Dmaven.test.skip release:prepare release:perform  \
           -DreleaseVersion=${MAJOR}.${MINOR}.$((PATCH+1)) \

@@ -68,6 +68,8 @@ jobs:
           distribution: ${{ inputs.distribution }}
       - name: Release rc version
         uses: dhananjay12/reusable-workflows/.github/actions/maven-release@main
+        with:
+          gh-token: ${{ secrets.REPO_TOKEN }}
   docker:
     needs: sonar
     runs-on: ubuntu-latest
