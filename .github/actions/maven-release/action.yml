@@ -1,8 +1,8 @@
 name: "Maven releases"
 description: "Maven RC, Minor and Patch releases"
 inputs:
-  pom-path:
-    description: 'POM file location'
+  pom-file:
+    description: 'POM file location. Default is at room (pom.xml)'
     required: false
     default: 'pom.xml'
   release-minor:
@@ -40,7 +40,7 @@ runs:
       id: pom-version
       shell: bash
       run: |
-        current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --file ${{ inputs.pom }})
+        current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --file ${{ inputs.pom-file }})
         current_version=${current_version%-*}
         VERSION_PARTS=(${current_version//-rc./ })
         sem_ver=${VERSION_PARTS[0]}
