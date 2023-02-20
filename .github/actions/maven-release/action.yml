@@ -13,6 +13,14 @@ inputs:
     description: 'Release patch version'
     required: false
     default: 'false'
+  java-version:
+    description: "Java version to Initialize repo"
+    required: false
+    default: "17"
+  distribution:
+    description: "Whether to cache dependencies or not."
+    required: false
+    default: "adopt"
 runs:
   using: "composite"
   steps:
@@ -23,6 +31,11 @@ runs:
           echo "Cannot release both minor and patch"
           exit 1
         fi
+    - name: Initialize Java and Maven
+      uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: ${{ inputs.distribution }}
     - name: Current POM version
       id: pom-version
       shell: bash
