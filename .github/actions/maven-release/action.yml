@@ -45,7 +45,7 @@ runs:
         CURRENT_SEM_VER: ${{steps.pom-version.outputs.current_sem_ver}}
       shell: bash
       run: |
-        if [ -z ${{ RC_VER }} ]
+        if [ -z ${RC_VER} ]
           mvn -Darguments=-Dmaven.test.skip release:prepare release:perform  \
           -DreleaseVersion=${CURRENT_SEM_VER}-rc.$(RC_VER) \
           -DdevelopmentVersion=${CURRENT_SEM_VER}-rc.$((RC_VER+1))-SNAPSHOT
