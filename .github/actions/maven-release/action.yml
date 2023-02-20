@@ -54,6 +54,11 @@ runs:
         echo "minor=${SEM_VER_PARTS[1]}" >> $GITHUB_OUTPUT
         echo "patch=${SEM_VER_PARTS[2]}" >> $GITHUB_OUTPUT
         echo "rc_ver=${rc_ver}" >> $GITHUB_OUTPUT
+    - name: Git config setup
+      shell: bash
+      run: |
+        git config user.name "GitHub Action"
+        git config user.email "action@github.com"
     - name: Release RC version
       if: (!inputs.release-minor && !inputs.release-patch)
       env:
