@@ -58,7 +58,7 @@ runs:
           echo "rc_ver is not a number. Check the RC_VER_PASSED variable is in correct format (eg. 1.0.0-rc.1)."
           exit 1
         fi
-        echo "major=${rc_ver}" >> $GITHUB_OUTPUT
+        echo "rc_ver=${rc_ver}" >> $GITHUB_OUTPUT
         # Extract git commit hash and short hash 
         git_commit_short=$(git rev-parse --short HEAD)
         echo "git_commit_short=${git_commit_short}" >> $GITHUB_OUTPUT
