@@ -1,10 +1,13 @@
-name: "Extract versions from pom"
+name: "Extract individual versions from POM or passed_tag"
 description: "Github Actions to Extract version"
 inputs:
   pom-file:
     description: 'POM file location. Default is at root (pom.xml)'
     required: false
     default: 'pom.xml'
+  release-tag:
+    description: 'Tag to be released. If not passed, it will be extracted from POM.'
+    required: false
 outputs:
   pom_current_version:
     description: "Current version in POM"
@@ -30,12 +33,12 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Current POM version
+    - name: Extract Versions
       id: pom-version
       shell: bash
       run: |
-        current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --file ${{ inputs.pom-file }})
-        echo "current_version=${current_version}" >> $GITHUB_OUTPUT
+        ##current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --file ${{ inputs.pom-file }})
+        echo "current_version=${{ inputs.release-tag }}" >> $GITHUB_OUTPUT
         #Remove -SNAPSHOT or -BETA
         current_version=${current_version%-SNAPSHOT}
         current_version=${current_version%-BETA}
