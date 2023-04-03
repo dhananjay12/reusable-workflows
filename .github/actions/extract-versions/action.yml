@@ -38,7 +38,7 @@ runs:
       shell: bash
       run: |
         ##current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --file ${{ inputs.pom-file }})
-        current_version=${{ inputs.release-tag }}"
+        current_version=${{ inputs.release-tag }}
         echo "current_version=${current_version}" >> $GITHUB_OUTPUT
         #Remove -SNAPSHOT or -BETA
         current_version=${current_version%-SNAPSHOT}
