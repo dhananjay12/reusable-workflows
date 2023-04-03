@@ -1,0 +1,65 @@
+name: "Extract individual versions from POM or passed_tag"
+description: "Github Actions to Extract version"
+inputs:
+  pom-file:
+    description: 'POM file location. Default is at root (pom.xml)'
+    required: false
+    default: 'pom.xml'
+  release-tag:
+    description: 'Tag to be released. If not passed, it will be extracted from POM.'
+    required: false
+outputs:
+  pom_current_version:
+    description: "Current version in POM"
+    value: ${{ steps.pom-version.outputs.current_version }}
+  pom_major:
+    description: "Major Version in  POM"
+    value: ${{ steps.pom-version.outputs.major }}
+  pom_minor:
+    description: "Minor Version in  POM"
+    value: ${{ steps.pom-version.outputs.minor }}
+  pom_patch:
+    description: "Patch Version in  POM"
+    value: ${{ steps.pom-version.outputs.patch }}
+  pom_rc:
+    description: "RC number Version in  POM for example 1.0.0-rc.2 would result in 2"
+    value: ${{ steps.pom-version.outputs.rc_ver }}
+  git_full_sha:
+    description: "Git full sha"
+    value: ${{ steps.pom-version.outputs.git_commit }}
+  git_short_sha:
+    description: "Git short sha"
+    value: ${{ steps.pom-version.outputs.git_commit_short }}
+runs:
+  using: "composite"
+  steps:
+    - name: Extract Versions
+      id: pom-version
+      shell: bash
+      run: |
+        ##current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --file ${{ inputs.pom-file }})
+        echo "current_version=${{ inputs.release-tag }}" >> $GITHUB_OUTPUT
+        #Remove -SNAPSHOT or -BETA
+        current_version=${current_version%-SNAPSHOT}
+        current_version=${current_version%-BETA}
+        ##SPLIT FROM -RC.
+        VERSION_PARTS=(${current_version//-rc./ })
+        sem_ver=${VERSION_PARTS[0]}
+        ##SPLIT FROM .
+        SEM_VER_PARTS=(${sem_ver//./ })
+        echo "major=${SEM_VER_PARTS[0]}" >> $GITHUB_OUTPUT
+        echo "minor=${SEM_VER_PARTS[1]}" >> $GITHUB_OUTPUT
+        echo "patch=${SEM_VER_PARTS[2]}" >> $GITHUB_OUTPUT
+        # Extract RC version
+        rc_ver=${VERSION_PARTS[1]}
+        # If RC_VER is empty or not a number, fail
+        if ! [[ "$rc_ver" =~ ^[0-9]+$ ]]; then
+          echo "rc_ver is not a number. Check the RC_VER_PASSED variable is in correct format (eg. 1.0.0-rc.1)."
+          exit 1
+        fi
+        echo "major=${rc_ver}" >> $GITHUB_OUTPUT
+        # Extract git commit hash and short hash 
+        git_commit_short=$(git rev-parse --short HEAD)
+        echo "git_commit_short=${git_commit_short}" >> $GITHUB_OUTPUT
+        git_commit=$(git rev-parse HEAD)
+        echo "git_commit=${git_commit}" >> $GITHUB_OUTPUT
