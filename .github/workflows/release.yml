@@ -18,13 +18,13 @@ on:
         description: 'Repo ID'
         required: false
         default: 'my-maven-repo'
-      url:
-        description: 'URL of Maven Repo to Deploy'
-        required: true
     secrets:
       REPO_TOKEN:
         required: true
         description: GITHUB_TOKEN Needed to get some information about the pull request, if any
+      JFROG_URL:
+        required: true
+        description: JFrog URL
       JFROG_USERNAME:
         required: true
         description: JFrog username
@@ -46,6 +46,9 @@ jobs:
         with:
           java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.distribution }}
+          maven-url: ${{ secrets.JFROG_URL }}
+          maven-username: ${{ secrets.JFROG_USERNAME }}
+          maven-password: ${{ secrets.JFROG_TOKEN }}
       - name: Build with Maven
         id: build
         run: mvn clean verify
