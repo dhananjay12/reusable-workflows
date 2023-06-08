@@ -53,10 +53,14 @@ jobs:
       - name: Build with Maven
         id: build
         run: mvn clean verify
-      - name: Docker Release
-        id: docker
+      - name: Artifact release
+        shell: bash
         run: |
-          mvn -Dmaven.test.skip=true package jib:build -Djib.to.auth.username=${{ secrets.DOCKERHUB_USERNAME }} -Djib.to.auth.password=${{ secrets.DOCKERHUB_TOKEN }}
+            mvn -Dmaven.test.skip deploy -DaltDeploymentRepository=my-maven-repo::default::${{ secrets.JFROG_URL }}/dj-mvn-snapshots
+#      - name: Docker Release
+#        id: docker
+#        run: |
+#          mvn -Dmaven.test.skip=true package jib:build -Djib.to.auth.username=${{ secrets.DOCKERHUB_USERNAME }} -Djib.to.auth.password=${{ secrets.DOCKERHUB_TOKEN }}
 
 
 
