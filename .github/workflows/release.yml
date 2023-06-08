@@ -14,13 +14,23 @@ on:
         default: 'adopt'
         required: false
         type: string
+      id:
+        description: 'Repo ID'
+        required: false
+        default: 'my-maven-repo'
+      url:
+        description: 'URL of Maven Repo to Deploy'
+        required: true
     secrets:
       REPO_TOKEN:
         required: true
         description: GITHUB_TOKEN Needed to get some information about the pull request, if any
-      SONAR_TOKEN:
+      JFROG_USERNAME:
         required: true
-        description: SonarCloud access token should be generated from https://sonarcloud.io/account/security/
+        description: JFrog username
+      JFROG_TOKEN:
+        required: true
+        description: JFrog token
       DOCKERHUB_USERNAME:
         required: true
         description: Dockerhub username
@@ -37,50 +47,10 @@ jobs:
           java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.distribution }}
       - name: Build with Maven
+        id: build
         run: mvn clean verify
-
-  sonar:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Initialize Java and Maven
-        uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
-        with:
-          java-version: ${{ inputs.java-version }}
-          distribution: ${{ inputs.distribution }}
-      # Make sure automatic scanning of the project in sonarcloud UI is disable. It can only do via pull or push
-      - name: Sonar Cloud scan
-        env:
-          # Needed to get some information about the pull request, if any
-          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-          # SonarCloud access token should be generated from https://sonarcloud.io/account/security/
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
-  artifact-release:
-    needs: sonar
-    runs-on: ubuntu-latest
-    steps:
-      - name: Initialize Java and Maven
-        uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
-        with:
-          java-version: ${{ inputs.java-version }}
-          distribution: ${{ inputs.distribution }}
-      - name: Release rc version
-        uses: dhananjay12/reusable-workflows/.github/actions/maven-release@main
-        with:
-          gh-token: ${{ secrets.REPO_TOKEN }}
-  docker:
-    needs: sonar
-    runs-on: ubuntu-latest
-    steps:
-      - name: Initialize Java and Maven
-        uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
-        with:
-          java-version: ${{ inputs.java-version }}
-          distribution: ${{ inputs.distribution }}
-      - name: Prepare variables
-        id: vars
+      - name: Docker Release
+        id: docker
         run: |
           mvn -Dmaven.test.skip=true package jib:build -Djib.to.auth.username=${{ secrets.DOCKERHUB_USERNAME }} -Djib.to.auth.password=${{ secrets.DOCKERHUB_TOKEN }}
 

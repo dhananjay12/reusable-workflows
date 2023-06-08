@@ -1,6 +1,6 @@
 fileignoreconfig:
 - filename: .github/actions/init-maven/action.yml
-  checksum: a21910c9f5a36c936851f745a91fb1cc062da25c30b0e67e00c5fa1805207017
+  checksum: 1f9800ece289779ab850ba02eef031eb5a0eb3ffb4ce945f12edaa531fbc4690
 - filename: .github/workflows/release.yml
   checksum: c4f53ebef1041c3237465a91615de2589e80e78f00064099f8fe36bea2cdb6de
 version: ""
