@@ -79,7 +79,6 @@ jobs:
       - name: Build with Maven
         run: mvn clean verify
       - name: Artifact release
-        if: ${{ inputs.release-artifacts }}
         shell: bash
         run: |
           mvn -Dmaven.test.skip deploy -DaltDeploymentRepository=my-maven-repo::default::${{ secrets.JFROG_URL }}/dj-mvn-releases

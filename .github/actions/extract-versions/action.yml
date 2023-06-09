@@ -53,7 +53,7 @@ runs:
         echo "patch=${SEM_VER_PARTS[2]}" >> $GITHUB_OUTPUT
         # Extract RC version
         rc_ver=${VERSION_PARTS[1]}
-        # If RC_VER is empty or not a number, fail
+        # If RC_VER is not empty and not a number, fail
         if [ -n "$rc_ver" ] && ! [[ "$rc_ver" =~ ^[0-9]+$ ]]; then
           echo "rc_ver is not a number. Check the RC_VER_PASSED variable is in correct format (eg. 1.0.0-rc.1)."
           exit 1
