@@ -1,0 +1,103 @@
+
+name: Build and Release
+
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        description: "Java version to Initialize repo"
+        default: '17'
+        required: false
+        type: string
+      distribution:
+        description: "Whether to cache dependencies or not."
+        default: 'adopt'
+        required: false
+        type: string
+      id:
+        description: 'Repo ID'
+        required: false
+        default: 'my-maven-repo'
+        type: string
+    secrets:
+      REPO_TOKEN:
+        required: true
+        description: GITHUB_TOKEN Needed to get some information about the pull request, if any
+      JFROG_URL:
+        required: true
+        description: JFrog URL
+      JFROG_USERNAME:
+        required: true
+        description: JFrog username
+      JFROG_TOKEN:
+        required: true
+        description: JFrog token
+      DOCKERHUB_USERNAME:
+        required: true
+        description: Dockerhub username
+      DOCKERHUB_TOKEN:
+        required: true
+        description:  Dockerhub token to push images
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check parameters
+        run: |
+          echo "Release tag: ${{ github.event.release.tag_name }}"
+          echo "Is a pre-release: ${{ github.event.release.prerelease }}"
+      - name: Initialize Java and Maven
+        uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: ${{ inputs.distribution }}
+          maven-url: ${{ secrets.JFROG_URL }}
+          maven-username: ${{ secrets.JFROG_USERNAME }}
+          maven-password: ${{ secrets.JFROG_TOKEN }}
+      - name: Extract version from passed tag
+        id: extract-versions
+        uses: dhananjay12/reusable-workflows/.github/actions/extract-versions@main
+        with:
+          release-tag: ${{ github.event.release.tag_name }}
+      - name: Echo extracted versions
+        run: |
+          echo "pom_current_version: ${{ steps.extract-versions.outputs.pom_current_version }}"
+          echo "pom_major: ${{ steps.extract-versions.outputs.pom_major }}"
+          echo "pom_minor: ${{ steps.extract-versions.outputs.pom_minor }}"
+          echo "pom_patch: ${{ steps.extract-versions.outputs.pom_patch }}"
+          echo "pom_rc: ${{ steps.extract-versions.outputs.pom_rc }}"
+      - name: Env Setup
+        id: env-setup
+        run: |
+          echo "Env setup"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Set Version passed
+        run: |
+          mvn versions:set -DnewVersion=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false -DprocessAllModules
+          git add . && git commit -m "Release version ${{ github.event.release.tag_name }}"
+      - name: Build with Maven
+        run: mvn clean verify
+      - name: Artifact release
+        if: ${{ inputs.release-artifacts }}
+        shell: bash
+        run: |
+          mvn -Dmaven.test.skip deploy -DaltDeploymentRepository=my-maven-repo::default::${{ secrets.JFROG_URL }}/dj-mvn-releases
+      - name: Prepare Next development version
+        id: prepare-next-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAJOR: ${{ steps.extract-versions.outputs.pom_major }}
+          MINOR: ${{ steps.extract-versions.outputs.pom_minor }}
+          PATCH: ${{ steps.extract-versions.outputs.pom_patch }}
+          RC: ${{ steps.extract-versions.outputs.pom_rc }}
+        run: |
+          # Set next version
+          mvn versions:set -DnewVersion=${MAJOR}.$((MINOR+1)).${PATCH}-SNAPSHOT -DgenerateBackupPoms=false -DprocessAllModules
+          # Commit and push changes
+          git add . && git commit -m "Prepare next development version"
+          git push --set-upstream origin ${{ github.ref }}
+
+
+
+
