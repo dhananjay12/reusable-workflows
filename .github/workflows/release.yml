@@ -82,6 +82,12 @@ jobs:
         shell: bash
         run: |
           mvn -Dmaven.test.skip deploy -DaltDeploymentRepository=my-maven-repo::default::${{ secrets.JFROG_URL }}/dj-mvn-releases
+      - name: Update Tag
+        id: update-tag
+        run: |
+          # Create a new tag with an updated commit reference
+          git tag -a "${{ github.event.release.tag_name }}" -f "${GITHUB_SHA}"
+          git push origin "${{ github.event.release.tag_name }}" --force
       - name: Prepare Next development version
         id: prepare-next-version
         env:
