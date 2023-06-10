@@ -101,7 +101,7 @@ jobs:
           mvn versions:set -DnewVersion=${MAJOR}.$((MINOR+1)).${PATCH}-SNAPSHOT -DgenerateBackupPoms=false -DprocessAllModules
           # Commit and push changes
           git add . && git commit -m "Prepare next development version"
-          git push --set-upstream origin ${{ github.ref }}
+          git push origin ${{ github.ref }}
 
 
 
