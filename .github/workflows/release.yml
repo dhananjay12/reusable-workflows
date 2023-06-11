@@ -93,17 +93,27 @@ jobs:
       - name: Prepare Next development version
         id: prepare-next-version
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
           MAJOR: ${{ steps.extract-versions.outputs.pom_major }}
           MINOR: ${{ steps.extract-versions.outputs.pom_minor }}
           PATCH: ${{ steps.extract-versions.outputs.pom_patch }}
           RC: ${{ steps.extract-versions.outputs.pom_rc }}
         run: |
           # Set next version
-          mvn versions:set -DnewVersion=${MAJOR}.$((MINOR+1)).${PATCH}-SNAPSHOT -DgenerateBackupPoms=false -DprocessAllModules
+          NEXT_DEVELOPMENT_VERSION="${MAJOR}.$((MINOR+1)).${PATCH}-SNAPSHOT"
+          echo "Next development version: $NEXT_DEVELOPMENT_VERSION"
+          mvn versions:set -DnewVersion=$NEXT_DEVELOPMENT_VERSION -DgenerateBackupPoms=false -DprocessAllModules
           # Commit and push changes
-          git add . && git commit -m "Prepare next development version"
-          git push origin ${{ github.ref }}
+          BRANCH=next-development-version-$NEXT_DEVELOPMENT_VERSION
+          git checkout -b $BRANCH
+          git add . && git commit -m "next-development-version-$NEXT_DEVELOPMENT_VERSION"
+          git push --set-upstream origin $BRANCH
+          
+          gh pr create \
+            --title "Update - \`$NEXT_DEVELOPMENT_VERSION\`" \
+            --body "Next development version \`$NEXT_DEVELOPMENT_VERSION\` version." \
+            --base ${{ github.event.release.target_commitish }} \
+            --head $BRANCH
 
 
 
