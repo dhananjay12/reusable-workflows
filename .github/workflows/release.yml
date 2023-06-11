@@ -77,7 +77,7 @@ jobs:
       - name: Set Version passed
         run: |
           mvn versions:set -DnewVersion=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false -DprocessAllModules
-          git add . && git commit -m "Release version ${{ github.event.release.tag_name }}"
+          git commit -am "Release version ${{ github.event.release.tag_name }}"
       - name: Build with Maven
         run: mvn clean verify
       - name: Artifact release
@@ -106,7 +106,7 @@ jobs:
           # Commit and push changes
           BRANCH=next-development-version-$NEXT_DEVELOPMENT_VERSION
           git checkout -b $BRANCH
-          git add . && git commit -m "next-development-version-$NEXT_DEVELOPMENT_VERSION"
+          git commit -am "next-development-version-$NEXT_DEVELOPMENT_VERSION"
           git push --set-upstream origin $BRANCH
           
           gh pr create \
