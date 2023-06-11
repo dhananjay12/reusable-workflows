@@ -26,6 +26,9 @@ on:
       JFROG_URL:
         required: true
         description: JFrog URL
+      JFROG_PATH:
+        required: true
+        description: JFrog PATH
       JFROG_USERNAME:
         required: true
         description: JFrog username
