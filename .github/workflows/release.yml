@@ -56,7 +56,7 @@ jobs:
         with:
           java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.distribution }}
-          maven-url: ${{ secrets.JFROG_URL }}
+          maven-url: ${{ secrets.JFROG_URL }}/${{ secrets.JFROG_PATH }}
           maven-username: ${{ secrets.JFROG_USERNAME }}
           maven-password: ${{ secrets.JFROG_TOKEN }}
       - name: Extract version from passed tag
@@ -86,7 +86,7 @@ jobs:
       - name: Artifact release
         shell: bash
         run: |
-          mvn -Dmaven.test.skip deploy -DaltDeploymentRepository=my-maven-repo::default::${{ secrets.JFROG_URL }}/dj-mvn-releases
+          mvn -Dmaven.test.skip deploy -DaltDeploymentRepository=my-maven-repo::default::${{ secrets.JFROG_URL }}/artifactory/dj-mvn-releases
       - name: Update Tag
         id: update-tag
         run: |

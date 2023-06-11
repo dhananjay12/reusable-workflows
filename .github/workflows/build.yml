@@ -50,7 +50,7 @@ jobs:
         with:
           java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.distribution }}
-          maven-url: ${{ secrets.JFROG_URL }}
+          maven-url: ${{ secrets.JFROG_URL }}/${{ secrets.JFROG_PATH }}
           maven-username: ${{ secrets.JFROG_USERNAME }}
           maven-password: ${{ secrets.JFROG_TOKEN }}
       - name: Build with Maven
@@ -59,7 +59,7 @@ jobs:
       - name: Artifact release
         shell: bash
         run: |
-            mvn -Dmaven.test.skip deploy -DaltDeploymentRepository=my-maven-repo::default::${{ secrets.JFROG_URL }}/dj-mvn-snapshots
+            mvn -Dmaven.test.skip deploy -DaltDeploymentRepository=my-maven-repo::default::${{ secrets.JFROG_URL }}/artifactory/dj-mvn-snapshots
 #      - name: Docker Release
 #        id: docker
 #        run: |
