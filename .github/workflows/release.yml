@@ -46,6 +46,7 @@ jobs:
         run: |
           echo "Release tag: ${{ github.event.release.tag_name }}"
           echo "Is a pre-release: ${{ github.event.release.prerelease }}"
+          echo "Github Red: ${{ github.ref }}"
       - name: Initialize Java and Maven
         uses: dhananjay12/reusable-workflows/.github/actions/init-maven@main
         with:
